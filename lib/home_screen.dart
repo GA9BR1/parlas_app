@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_study/auth_provider.dart';
+import 'package:project_study/login_screen.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,17 +10,22 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     if (authProvider.isLoggedIn) {
-      return const Scaffold(
-        body: Center(
-          child: Text("Home Screen"),
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              children: [
+                ElevatedButton(
+                    onPressed: () => authProvider.logout(),
+                    child: const Text("Logout")),
+                const Text("Home Screen"),
+              ],
+            ),
+          ),
         ),
       );
     } else {
-      return const Scaffold(
-        body: Center(
-          child: Text("Login Screen"),
-        ),
-      );
+      return LoginScreen();
     }
   }
 }
