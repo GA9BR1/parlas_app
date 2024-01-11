@@ -8,7 +8,6 @@ import 'package:project_study/router.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group('end-to-end test', () {
-    AuthProvider authProviderGlobal = AuthProvider();
     testWidgets('Visitor logs in and sees the home screen',
         (widgetTester) async {
       final authProvider = AuthProvider();
@@ -33,14 +32,13 @@ void main() {
 
       expect(circularProgress, findsOneWidget);
       await widgetTester.pumpAndSettle();
+      expect(circularProgress, findsNothing);
       expect(find.text("Home Screen"), findsOneWidget);
-
-      authProviderGlobal = AuthProvider().from(authProvider);
     });
 
     testWidgets('User imediately sees the home screen when logged in',
         (widgetTester) async {
-      final authProvider = AuthProvider().from(authProviderGlobal);
+      final authProvider = AuthProvider();
       await widgetTester.pumpWidget(MultiProvider(
           providers: [
             ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
@@ -50,6 +48,23 @@ void main() {
           )));
 
       expect(find.text("Home Screen"), findsOneWidget);
+    });
+
+    testWidgets('User logs out and sees the login screen',
+        (widgetTester) async {
+      final authProvider = AuthProvider();
+      await widgetTester.pumpWidget(MultiProvider(
+          providers: [
+            ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
+          ],
+          child: MaterialApp.router(
+            routerConfig: router,
+          )));
+
+      final logoutButton = find.widgetWithText(ElevatedButton, 'Logout');
+      await widgetTester.tap(logoutButton);
+      await widgetTester.pumpAndSettle();
+      expect(find.text("Parlas"), findsOneWidget);
     });
   });
 }

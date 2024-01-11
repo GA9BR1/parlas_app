@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_study/auth_provider.dart';
 import 'package:provider/provider.dart';
@@ -11,9 +12,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  fill() {
+    emailController.text = "gustavo@email.com";
+    passwordController.text = "password";
+  }
 
   signIn() async {
     AuthProvider authProvider =
@@ -26,15 +31,17 @@ class _LoginScreenState extends State<LoginScreen> {
     await authProvider
         .authenticate(
             email: emailController.text, password: passwordController.text)
+        .then((_) => context.go('/'))
         .onError((error, __) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(error.toString())));
-    }).whenComplete(() => Navigator.of(context).pop());
+    }).whenComplete(() {
+      Navigator.of(context).pop();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -44,55 +51,60 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       child: Scaffold(
           backgroundColor: Colors.transparent,
-          body: SafeArea(
-            child: Center(
-                child: Column(
-              children: [
-                const SizedBox(height: 100),
-                Text("Parlas",
-                    style: GoogleFonts.pacifico(
-                        fontSize: 50, color: Colors.white)),
-                const SizedBox(height: 100),
-                Form(
-                    child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Column(children: [
-                    LoginField(controller: emailController, hintText: 'Email'),
-                    const SizedBox(height: 30),
-                    LoginField(
-                        controller: passwordController, hintText: 'Password'),
-                    const SizedBox(height: 50),
-                    ElevatedButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("Login",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.black54)),
-                                SizedBox(width: 5),
-                                Column(children: [
-                                  SizedBox(
-                                    height: 3,
-                                  ),
-                                  Icon(Icons.login, color: Colors.black54)
-                                ])
-                              ],
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Center(
+                  child: Column(
+                children: [
+                  const SizedBox(height: 100),
+                  Text("Parlas",
+                      style: GoogleFonts.pacifico(
+                          fontSize: 50, color: Colors.white)),
+                  const SizedBox(height: 100),
+                  Form(
+                      child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Column(children: [
+                      ElevatedButton(
+                          onPressed: fill, child: const Text("Fill")),
+                      LoginField(
+                          controller: emailController, hintText: 'Email'),
+                      const SizedBox(height: 30),
+                      LoginField(
+                          controller: passwordController, hintText: 'Password'),
+                      const SizedBox(height: 50),
+                      ElevatedButton(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text("Login",
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.black54)),
+                                  SizedBox(width: 5),
+                                  Column(children: [
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Icon(Icons.login, color: Colors.black54)
+                                  ])
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      onPressed: () => signIn(),
-                    )
-                  ]),
-                ))
-              ],
-            )),
+                          ],
+                        ),
+                        onPressed: () => signIn(),
+                      )
+                    ]),
+                  ))
+                ],
+              )),
+            ),
           )),
     );
   }

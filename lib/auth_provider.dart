@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider with ChangeNotifier {
-  String baseUrl = "http://10.0.2.2:3000";
+  String baseUrl = "http://192.168.15.8:3000";
   User user = User();
 
   AuthProvider() {
@@ -44,22 +44,13 @@ class AuthProvider with ChangeNotifier {
     prefs.setString('accessToken', user.accessToken!);
   }
 
-  Future<void> populateUser(
-      {String? uid, String? client, String? accessToken}) async {
+  Future<void> populateUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (uid != null && client != null && accessToken != null) {
-      prefs.setString('uid', uid);
-      prefs.setString('client', client);
-      prefs.setString('accessToken', accessToken);
 
-      user.uid = prefs.getString('uid');
-      user.client = prefs.getString('client');
-      user.accessToken = prefs.getString('accessToken');
-    } else {
-      user.uid = prefs.getString('uid');
-      user.client = prefs.getString('client');
-      user.accessToken = prefs.getString('accessToken');
-    }
+    user.uid = prefs.getString('uid');
+    user.client = prefs.getString('client');
+    user.accessToken = prefs.getString('accessToken');
+
     notifyListeners();
   }
 
@@ -75,23 +66,6 @@ class AuthProvider with ChangeNotifier {
   }
 
   get isLoggedIn => user.uid != null;
-
-  Future<Map<String, String>> sharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return {
-      "uid": prefs.getString('uid')!,
-      "client": prefs.getString('client')!,
-      "accessToken": prefs.getString('accessToken')!,
-    };
-  }
-
-  AuthProvider from(AuthProvider authProvider) {
-    populateUser(
-        uid: authProvider.user.uid,
-        client: authProvider.user.client,
-        accessToken: authProvider.user.accessToken);
-    return this;
-  }
 }
 
 class User {
