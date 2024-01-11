@@ -3,16 +3,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:project_study/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  signIn() async {
+    AuthProvider authProvider =
+        Provider.of<AuthProvider>(context, listen: false);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
+    await authProvider
+        .authenticate(
+            email: emailController.text, password: passwordController.text)
+        .onError((error, __) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }).whenComplete(() => Navigator.of(context).pop());
+  }
+
   @override
   Widget build(BuildContext context) {
-    AuthProvider authProvider = Provider.of<AuthProvider>(context);
-
+    
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -65,10 +87,7 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      onPressed: () => authProvider.authenticate(
-                          email: emailController.text,
-                          password: passwordController.text,
-                          context: context),
+                      onPressed: () => signIn(),
                     )
                   ]),
                 ))

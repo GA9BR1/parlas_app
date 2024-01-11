@@ -11,6 +11,6 @@ class LoggedInRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    return authProvider.isLoggedIn ? child : LoginScreen();
+    return authProvider.isLoggedIn ? child : const LoginScreen();
   }
 }

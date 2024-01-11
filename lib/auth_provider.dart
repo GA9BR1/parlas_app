@@ -10,36 +10,31 @@ class AuthProvider with ChangeNotifier {
     populateUser();
   }
 
-  Future<void> authenticate(
-      {required String email,
-      required String password,
-      required BuildContext context}) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(child: CircularProgressIndicator());
-        });
-
+  Future<void> authenticate({
+    required String email,
+    required String password,
+  }) async {
     var url = Uri.parse("$baseUrl/auth/sign_in");
-    await http.post(url, body: {
-      "email": email,
-      "password": password,
-    }).then((response) async {
+    try {
+      var response = await http.post(url, body: {
+        "email": email,
+        "password": password,
+      });
       if (response.statusCode == 200) {
         user.uid = response.headers['uid'];
         user.client = response.headers['client'];
         user.accessToken = response.headers['access-token'];
         await persistUser();
+      } else if (response.statusCode == 401) {
+        return Future.error('Your email or password are incorrect');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Invalid email or password")));
+        return Future.error('An unkown error has ocourred. Try again later');
       }
-    }).onError((_, __) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("An unkown error has ocourred. Try again later")));
-    }).whenComplete(() => Navigator.pop(context));
-
-    notifyListeners();
+    } catch (e) {
+      return Future.error('An unkown error has ocourred. Try again later');
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<void> persistUser() async {
@@ -49,11 +44,22 @@ class AuthProvider with ChangeNotifier {
     prefs.setString('accessToken', user.accessToken!);
   }
 
-  Future<void> populateUser() async {
+  Future<void> populateUser(
+      {String? uid, String? client, String? accessToken}) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    user.uid = prefs.getString('uid');
-    user.client = prefs.getString('client');
-    user.accessToken = prefs.getString('accessToken');
+    if (uid != null && client != null && accessToken != null) {
+      prefs.setString('uid', uid);
+      prefs.setString('client', client);
+      prefs.setString('accessToken', accessToken);
+
+      user.uid = prefs.getString('uid');
+      user.client = prefs.getString('client');
+      user.accessToken = prefs.getString('accessToken');
+    } else {
+      user.uid = prefs.getString('uid');
+      user.client = prefs.getString('client');
+      user.accessToken = prefs.getString('accessToken');
+    }
     notifyListeners();
   }
 
@@ -69,6 +75,23 @@ class AuthProvider with ChangeNotifier {
   }
 
   get isLoggedIn => user.uid != null;
+
+  Future<Map<String, String>> sharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return {
+      "uid": prefs.getString('uid')!,
+      "client": prefs.getString('client')!,
+      "accessToken": prefs.getString('accessToken')!,
+    };
+  }
+
+  AuthProvider from(AuthProvider authProvider) {
+    populateUser(
+        uid: authProvider.user.uid,
+        client: authProvider.user.client,
+        accessToken: authProvider.user.accessToken);
+    return this;
+  }
 }
 
 class User {
