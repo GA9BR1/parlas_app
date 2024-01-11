@@ -18,6 +18,7 @@ void main() {
           child: MaterialApp.router(
             routerConfig: router,
           )));
+      await widgetTester.pumpAndSettle();
 
       final emailField = find.widgetWithText(TextFormField, 'Email');
       final passwordField = find.widgetWithText(TextFormField, 'Password');
@@ -63,8 +64,13 @@ void main() {
 
       final logoutButton = find.widgetWithText(ElevatedButton, 'Logout');
       await widgetTester.tap(logoutButton);
+      await widgetTester.pump();
+      final circularProgress = find
+          .byWidgetPredicate((widget) => widget is CircularProgressIndicator);
+      expect(circularProgress, findsOneWidget);
       await widgetTester.pumpAndSettle();
       expect(find.text("Parlas"), findsOneWidget);
+      expect(circularProgress, findsNothing);
     });
   });
 }

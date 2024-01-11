@@ -15,10 +15,18 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               ElevatedButton(
-                  onPressed: () => {
-                        authProvider.logout(),
-                        context.go('/login'),
-                      },
+                  onPressed: () async {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        });
+                    await authProvider.logout().whenComplete(() {
+                      Navigator.of(context).pop();
+                      context.go('/login');
+                    });
+                  },
                   child: const Text("Logout")),
               const Text("Home Screen"),
             ],

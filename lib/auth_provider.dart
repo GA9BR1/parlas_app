@@ -55,7 +55,19 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    if (user.uid == null || user.client == null || user.accessToken == null) {
+      return;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    var url = Uri.parse("$baseUrl/auth/sign_out");
+
+    await http.delete(url, headers: {
+      "uid": user.uid!,
+      "client": user.client!,
+      "access-token": user.accessToken!,
+    });
+
     prefs.remove('uid');
     prefs.remove('client');
     prefs.remove('accessToken');
@@ -65,7 +77,23 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  get isLoggedIn => user.uid != null;
+  Future<bool> isLoggedIn() async {
+    var url = Uri.parse("$baseUrl/auth/validate_token");
+    try {
+      var response = await http.get(url, headers: {
+        "uid": user.uid!,
+        "client": user.client!,
+        "access-token": user.accessToken!,
+      });
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 class User {
