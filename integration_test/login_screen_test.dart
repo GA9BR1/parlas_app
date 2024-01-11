@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:project_study/auth_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:project_study/router.dart';
+import 'package:project_study/main.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group('end-to-end test', () {
     testWidgets('Visitor logs in and sees the home screen',
         (widgetTester) async {
-      final authProvider = AuthProvider();
-      await widgetTester.pumpWidget(MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
-          ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          )));
+      await widgetTester.pumpWidget(const MainApp());
       await widgetTester.pumpAndSettle();
 
       final emailField = find.widgetWithText(TextFormField, 'Email');
@@ -39,28 +30,14 @@ void main() {
 
     testWidgets('User imediately sees the home screen when logged in',
         (widgetTester) async {
-      final authProvider = AuthProvider();
-      await widgetTester.pumpWidget(MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
-          ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          )));
+      await widgetTester.pumpWidget(const MainApp());
 
       expect(find.text("Home Screen"), findsOneWidget);
     });
 
     testWidgets('User logs out and sees the login screen',
         (widgetTester) async {
-      final authProvider = AuthProvider();
-      await widgetTester.pumpWidget(MultiProvider(
-          providers: [
-            ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
-          ],
-          child: MaterialApp.router(
-            routerConfig: router,
-          )));
+      await widgetTester.pumpWidget(const MainApp());
 
       final logoutButton = find.widgetWithText(ElevatedButton, 'Logout');
       await widgetTester.tap(logoutButton);

@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:project_study/auth_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:project_study/router.dart';
+import 'package:project_study/login_screen.dart';
 
 void main() {
-  testWidgets("Visitor sees the login screen when he is not logged in",
-      (widgetTester) async {
-    final authProvider = AuthProvider();
-
-    await widgetTester.pumpWidget(MultiProvider(
-        providers: [
-          ChangeNotifierProvider<AuthProvider>(create: (_) => authProvider),
-        ],
-        child: MaterialApp.router(
-          routerConfig: router,
-        )));
+  testWidgets("Login screen has the correct widgets", (widgetTester) async {
+    await widgetTester.pumpWidget(
+      const MaterialApp(
+        home: LoginScreen(),
+      ),
+    );
 
     final emailField = find.widgetWithText(TextFormField, 'Email');
     final passwordField = find.widgetWithText(TextFormField, 'Password');
