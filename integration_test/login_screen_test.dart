@@ -31,6 +31,7 @@ void main() {
     testWidgets('User imediately sees the home screen when logged in',
         (widgetTester) async {
       await widgetTester.pumpWidget(const MainApp());
+      await widgetTester.pumpAndSettle();
 
       expect(find.text("Home Screen"), findsOneWidget);
     });
@@ -38,6 +39,7 @@ void main() {
     testWidgets('User logs out and sees the login screen',
         (widgetTester) async {
       await widgetTester.pumpWidget(const MainApp());
+      await widgetTester.pumpAndSettle();
 
       final logoutButton = find.widgetWithText(ElevatedButton, 'Logout');
       await widgetTester.tap(logoutButton);

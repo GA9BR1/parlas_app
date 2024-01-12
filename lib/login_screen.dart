@@ -73,33 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       LoginField(
                           controller: passwordController, hintText: 'Password'),
                       const SizedBox(height: 50),
-                      ElevatedButton(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text("Login",
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.black54)),
-                                  SizedBox(width: 5),
-                                  Column(children: [
-                                    SizedBox(
-                                      height: 3,
-                                    ),
-                                    Icon(Icons.login, color: Colors.black54)
-                                  ])
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        onPressed: () => signIn(),
-                      )
+                      LoginButton(signIn: signIn),
                     ]),
                   ))
                 ],
@@ -142,6 +116,41 @@ class LoginField extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(10)),
             borderSide: BorderSide(color: Colors.white),
           )),
+    );
+  }
+}
+
+class LoginButton extends StatelessWidget {
+  final Function signIn;
+  const LoginButton({super.key, required this.signIn});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Login",
+                    style: TextStyle(fontSize: 20, color: Colors.black54)),
+                SizedBox(width: 5),
+                Column(children: [
+                  SizedBox(
+                    height: 3,
+                  ),
+                  Icon(Icons.login, color: Colors.black54)
+                ])
+              ],
+            ),
+          ),
+        ],
+      ),
+      onPressed: () => signIn(),
     );
   }
 }
