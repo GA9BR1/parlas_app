@@ -50,25 +50,59 @@ class HomeScreen extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height * .05),
+                SizedBox(height: MediaQuery.of(context).size.height * .031),
                 Container(
                   width: MediaQuery.of(context).size.width * .9,
                   height: MediaQuery.of(context).size.height * .7,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white),
-                  child: const Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20)),
-                        child: Image(
-                            fit: BoxFit.cover,
-                            image:
-                                AssetImage('lib/images/aleatory_person.jpeg')),
+                    borderRadius: BorderRadius.circular(20),
+                    image: const DecorationImage(
+                      image: AssetImage("lib/images/aleatory_person.jpeg"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Container(
+                    margin: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * .5),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20)),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.black.withOpacity(0.4),
+                          Colors.transparent
+                        ],
                       ),
-                    ],
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(
+                          MediaQuery.of(context).size.width * .03),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text("José Hernandez",
+                                  style: GoogleFonts.lobster(
+                                      fontSize: 20, color: Colors.white)),
+                              const SizedBox(width: 10),
+                              Text("20",
+                                  style: GoogleFonts.lobster(
+                                      fontSize: 20, color: Colors.white)),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text("Mexico - Mexico City",
+                                  style: GoogleFonts.quicksand(
+                                      fontSize: 15, color: Colors.white)),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -76,11 +110,14 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
         bottomNavigationBar: BottomAppBar(
+            height: MediaQuery.of(context).size.height * .15,
             surfaceTintColor: Colors.transparent,
             color: Colors.transparent,
-            padding: EdgeInsets.symmetric(
-                horizontal: MediaQuery.of(context).size.width * .35,
-                vertical: 10),
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * .02,
+                left: MediaQuery.of(context).size.width * .35,
+                right: MediaQuery.of(context).size.width * .35,
+                bottom: MediaQuery.of(context).size.height * .04),
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20), color: Colors.white),
