@@ -14,6 +14,7 @@ dependencies:
   shared_preferences:
   provider:
   http:
+  like_button:
 
 dev_dependencies:
   flutter_test:
