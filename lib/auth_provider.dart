@@ -7,9 +7,8 @@ class AuthProvider with ChangeNotifier {
   User user = User();
 
   Future<AuthProvider> build() async {
-    AuthProvider authProvider = AuthProvider();
-    await authProvider.populateUser();
-    return authProvider;
+    await populateUser();
+    return this;
   }
 
   Future<void> authenticate({

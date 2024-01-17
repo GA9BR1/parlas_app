@@ -31,6 +31,7 @@ class Person {
   late Dob dob;
   late String cell;
   late Picture picture;
+  bool isLiked = false;
 
   Person({
     required this.gender,

@@ -12,6 +12,44 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        // Add one stop for each color. Stops should increase from 0 to 1
+        stops: [0.1, 0.5, 0.7, 0.9],
+        colors: [
+          // Colors are easy thanks to Flutter's Colors class.
+          Color.fromRGBO(150, 50, 25, 0.682),
+          Color.fromARGB(209, 156, 52, 26),
+          Color.fromARGB(173, 187, 57, 24),
+          Color.fromARGB(174, 230, 53, 9),
+        ],
+      )),
+      child: const Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: TopBar(),
+        ),
+        body: CardPages(),
+        bottomNavigationBar: BottomBar(),
+      ),
+    );
+  }
+}
+
+class CardPages extends StatefulWidget {
+  const CardPages({super.key});
+
+  @override
+  State<CardPages> createState() => _CardPagesState();
+}
+
+class _CardPagesState extends State<CardPages> {
   late Future<List<Person>> people;
   int previousCard = 0;
 
@@ -34,79 +72,53 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-          gradient: LinearGradient(
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-        // Add one stop for each color. Stops should increase from 0 to 1
-        stops: [0.1, 0.5, 0.7, 0.9],
-        colors: [
-          // Colors are easy thanks to Flutter's Colors class.
-          Color.fromRGBO(150, 50, 25, 0.682),
-          Color.fromARGB(209, 156, 52, 26),
-          Color.fromARGB(173, 187, 57, 24),
-          Color.fromARGB(174, 230, 53, 9),
-        ],
+    return SafeArea(
+      child: Center(
+          child: FutureBuilder(
+        future: people,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
+            return const CircularProgressIndicator();
+          } else {
+            if (snapshot.hasData) {
+              return PageView(
+                onPageChanged: (value) async {
+                  if (value % 3 == 0 && value > previousCard) {
+                    setState(() {
+                      previousCard = value;
+                    });
+                    await fetchMorePeople();
+                  }
+                },
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var person in snapshot.data as List<Person>) ...[
+                    Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: MediaQuery.of(context).size.width * .05,
+                            vertical: MediaQuery.of(context).size.height * .02),
+                        child: PersonCard(person: person)),
+                  ]
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return Text("${snapshot.error}");
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Server is not responding as expected...",
+                    style:
+                        GoogleFonts.nunito(fontSize: 20, color: Colors.white)),
+                Text("Try again later.",
+                    style:
+                        GoogleFonts.nunito(fontSize: 20, color: Colors.white)),
+              ],
+            );
+          }
+        },
       )),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: TopBar(),
-        ),
-        body: SafeArea(
-          child: Center(
-              child: FutureBuilder(
-            future: people,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting &&
-                  !snapshot.hasData) {
-                return const CircularProgressIndicator();
-              } else {
-                if (snapshot.hasData) {
-                  return PageView(
-                    onPageChanged: (value) async {
-                      if (value % 3 == 0 && value > previousCard) {
-                        setState(() {
-                          previousCard = value;
-                        });
-                        await fetchMorePeople();
-                      }
-                    },
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      for (var person in snapshot.data as List<Person>) ...[
-                        Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal:
-                                    MediaQuery.of(context).size.width * .05,
-                                vertical:
-                                    MediaQuery.of(context).size.height * .02),
-                            child: PersonCard(person: person)),
-                      ]
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Server is not responding as expected...",
-                        style: GoogleFonts.nunito(
-                            fontSize: 20, color: Colors.white)),
-                    Text("Try again later.",
-                        style: GoogleFonts.nunito(
-                            fontSize: 20, color: Colors.white)),
-                  ],
-                );
-              }
-            },
-          )),
-        ),
-        bottomNavigationBar: const BottomBar(),
-      ),
     );
   }
 }
@@ -332,7 +344,16 @@ class _PersonCardState extends State<PersonCard> {
                                       color: Colors.white,
                                       size: 32,
                                     )),
-                                const LikeButton(size: 35),
+                                LikeButton(
+                                  isLiked: widget.person.isLiked,
+                                  size: 35,
+                                  onTap: (_) {
+                                    setState(() {
+                                      widget.person.isLiked = true;
+                                    });
+                                    return Future.value(true);
+                                  },
+                                ),
                               ],
                             ),
                           ),
