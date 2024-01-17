@@ -6,8 +6,10 @@ class AuthProvider with ChangeNotifier {
   String baseUrl = "http://192.168.15.8:3000";
   User user = User();
 
-  AuthProvider() {
-    populateUser();
+  Future<AuthProvider> build() async {
+    AuthProvider authProvider = AuthProvider();
+    await authProvider.populateUser();
+    return authProvider;
   }
 
   Future<void> authenticate({

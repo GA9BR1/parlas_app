@@ -7,17 +7,38 @@ void main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
   @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+  late Future<AuthProvider> authProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      authProvider = AuthProvider().build();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
-        ],
-        child: MaterialApp.router(
-          routerConfig: router,
-        ));
+    return FutureBuilder(
+      future: authProvider,
+      builder: (context, snapshot) => snapshot.hasData
+          ? MultiProvider(
+              providers: [
+                  ChangeNotifierProvider<AuthProvider>.value(
+                      value: snapshot.data as AuthProvider),
+                ],
+              child: MaterialApp.router(
+                routerConfig: router,
+              ))
+          : const CircularProgressIndicator(),
+    );
   }
 }

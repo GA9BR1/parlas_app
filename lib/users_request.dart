@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 Future<List<Person>> getPeople() async {
-  var url = Uri.parse("https://randomuser.me/api/?results=10");
+  var url = Uri.parse("https://randomuser.me/api/?results=5");
   try {
     var response = await http.get(url);
 

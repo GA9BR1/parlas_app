@@ -13,12 +13,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Person>> people;
+  int previousCard = 0;
 
   @override
   void initState() {
     super.initState();
     setState(() {
       people = getPeople();
+    });
+  }
+
+  Future<void> fetchMorePeople() async {
+    List<Person> newPeople = await getPeople();
+    List<Person> currentPeople = await people;
+    currentPeople.addAll(newPeople);
+    setState(() {
+      people = Future.value(currentPeople);
     });
   }
 
@@ -39,113 +49,135 @@ class _HomeScreenState extends State<HomeScreen> {
           Color.fromARGB(174, 230, 53, 9),
         ],
       )),
-      child: GestureDetector(
-        onVerticalDragEnd: (details) => {
-          if (details.primaryVelocity! > 0)
-            {
-              setState(() {
-                people = getPeople();
-              })
-            }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            actions: const [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Icon(
-                  Icons.messenger_outline_outlined,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(width: 10),
-            ],
-            title: Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  "Parlas",
-                  style: GoogleFonts.pacifico(
-                      fontSize: 25,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white),
-                )),
-          ),
-          body: SafeArea(
-            child: Center(
-                child: FutureBuilder(
-              future: getPeople(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else {
-                  if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                    return PageView(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        for (var person in snapshot.data as List<Person>) ...[
-                          Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * .05,
-                                  vertical:
-                                      MediaQuery.of(context).size.height * .02),
-                              child: PersonCard(person: person)),
-                        ]
-                      ],
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: const PreferredSize(
+          preferredSize: Size.fromHeight(kToolbarHeight),
+          child: TopBar(),
+        ),
+        body: SafeArea(
+          child: Center(
+              child: FutureBuilder(
+            future: people,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting &&
+                  !snapshot.hasData) {
+                return const CircularProgressIndicator();
+              } else {
+                if (snapshot.hasData) {
+                  return PageView(
+                    onPageChanged: (value) async {
+                      if (value % 3 == 0 && value > previousCard) {
+                        setState(() {
+                          previousCard = value;
+                        });
+                        await fetchMorePeople();
+                      }
+                    },
+                    scrollDirection: Axis.horizontal,
                     children: [
-                      Text("Server is not responding as expected...",
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: Colors.white)),
-                      Text("Try again later.",
-                          style: GoogleFonts.nunito(
-                              fontSize: 20, color: Colors.white)),
+                      for (var person in snapshot.data as List<Person>) ...[
+                        Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * .05,
+                                vertical:
+                                    MediaQuery.of(context).size.height * .02),
+                            child: PersonCard(person: person)),
+                      ]
                     ],
                   );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
                 }
-              },
-            )),
-          ),
-          bottomNavigationBar: BottomAppBar(
-              height: MediaQuery.of(context).size.height * .15,
-              surfaceTintColor: Colors.transparent,
-              color: Colors.transparent,
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * .02,
-                  left: MediaQuery.of(context).size.width * .35,
-                  right: MediaQuery.of(context).size.width * .35,
-                  bottom: MediaQuery.of(context).size.height * .04),
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                        onPressed: () => context.go('/settings'),
-                        icon: const Icon(
-                          Icons.settings,
-                          size: 30,
-                        )),
-                    IconButton(
-                      onPressed: () => {},
-                      icon: const Icon(Icons.person, size: 30),
-                    ),
+                    Text("Server is not responding as expected...",
+                        style: GoogleFonts.nunito(
+                            fontSize: 20, color: Colors.white)),
+                    Text("Try again later.",
+                        style: GoogleFonts.nunito(
+                            fontSize: 20, color: Colors.white)),
                   ],
-                ),
-              )),
+                );
+              }
+            },
+          )),
         ),
+        bottomNavigationBar: const BottomBar(),
       ),
+    );
+  }
+}
+
+class BottomBar extends StatelessWidget {
+  const BottomBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+        height: MediaQuery.of(context).size.height * .15,
+        surfaceTintColor: Colors.transparent,
+        color: Colors.transparent,
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height * .02,
+            left: MediaQuery.of(context).size.width * .35,
+            right: MediaQuery.of(context).size.width * .35,
+            bottom: MediaQuery.of(context).size.height * .04),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20), color: Colors.white),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                  onPressed: () => context.go('/settings'),
+                  icon: const Icon(
+                    Icons.settings,
+                    size: 30,
+                  )),
+              IconButton(
+                onPressed: () => {},
+                icon: const Icon(Icons.person, size: 30),
+              ),
+            ],
+          ),
+        ));
+  }
+}
+
+class TopBar extends StatelessWidget {
+  const TopBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      actions: const [
+        Align(
+          alignment: Alignment.centerRight,
+          child: Icon(
+            Icons.messenger_outline_outlined,
+            color: Colors.white,
+          ),
+        ),
+        SizedBox(width: 10),
+      ],
+      title: Align(
+          alignment: Alignment.topLeft,
+          child: Text(
+            "Parlas",
+            style: GoogleFonts.pacifico(
+                fontSize: 25,
+                fontWeight: FontWeight.normal,
+                color: Colors.white),
+          )),
     );
   }
 }
@@ -178,9 +210,13 @@ class _PersonCardState extends State<PersonCard> {
         ),
       ),
       child: GestureDetector(
-        onVerticalDragStart: (_) => {
+        onVerticalDragEnd: (details) => {
           setState(() {
-            openDescription = !openDescription;
+            if (openDescription && details.primaryVelocity! > 0) {
+              openDescription = false;
+            } else if (!openDescription && details.primaryVelocity! < 0) {
+              openDescription = true;
+            }
           })
         },
         onTap: () => {
