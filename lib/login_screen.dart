@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:project_study/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:project_study/widgets/text_field.dart' as custom;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -42,6 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    precacheImage(
+      const AssetImage("lib/images/login_background.jpg"),
+      context,
+    );
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -54,67 +59,41 @@ class _LoginScreenState extends State<LoginScreen> {
           body: SingleChildScrollView(
             child: SafeArea(
               child: Center(
-                  child: Column(
-                children: [
-                  const SizedBox(height: 100),
-                  Text("Parlas",
-                      style: GoogleFonts.pacifico(
-                          fontSize: 50, color: Colors.white)),
-                  const SizedBox(height: 100),
-                  Form(
-                      child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Column(children: [
-                      ElevatedButton(
-                          onPressed: fill, child: const Text("Fill")),
-                      LoginField(
+                  child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 100),
+                    Text("Parlas",
+                        style: GoogleFonts.pacifico(
+                            fontSize: 50, color: Colors.white)),
+                    const SizedBox(height: 100),
+                    Form(
+                        child: Column(children: [
+                      custom.TextField(
                           controller: emailController, hintText: 'Email'),
                       const SizedBox(height: 30),
-                      LoginField(
+                      custom.TextField(
                           controller: passwordController, hintText: 'Password'),
                       const SizedBox(height: 50),
                       LoginButton(signIn: signIn),
-                    ]),
-                  ))
-                ],
+                    ])),
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text("Don't have an account? ",
+                            style: TextStyle(color: Colors.white)),
+                        TextButton(
+                            onPressed: () => context.go('/signup'),
+                            child: const Text("Sign Up",
+                                style: TextStyle(color: Colors.white))),
+                      ],
+                    ),
+                  ],
+                ),
               )),
             ),
-          )),
-    );
-  }
-}
-
-class LoginField extends StatelessWidget {
-  const LoginField({
-    super.key,
-    required this.controller,
-    required this.hintText,
-  });
-
-  final TextEditingController controller;
-  final String hintText;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      cursorColor: Colors.white,
-      obscureText: hintText == 'Password' ? true : false,
-      style: const TextStyle(
-          color: Colors.white,
-          decoration: TextDecoration.none,
-          decorationThickness: 0),
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.white),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            borderSide: BorderSide(color: Colors.white),
-          ),
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            borderSide: BorderSide(color: Colors.white),
           )),
     );
   }
