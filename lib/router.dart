@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:project_study/auth_provider.dart';
+import 'package:project_study/description_register_screen.dart';
 import 'package:project_study/home_screen.dart';
 import 'package:project_study/login_screen.dart';
 import 'package:project_study/sign_up.dart';
+import 'package:project_study/upload_image_register_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:project_study/settings_screen.dart';
 
@@ -31,10 +33,14 @@ final router = GoRouter(initialLocation: '/home_validation', routes: [
   ),
   GoRoute(
     path: '/signup',
-    builder: (context, state) => SignUpScreen(),
+    builder: (context, state) => const SignUpScreen(),
   ),
   GoRoute(
-      path: '/settings',
-      builder: (context, state) => const SettingsScreen(),
-      redirect: (context, state) => redirectToLogin(context))
+      path: '/signup/image',
+      builder: (context, state) => const UploadImageRegisterScreen()),
+  GoRoute(
+      path: '/signup/description',
+      builder: (context, state) => const DescriptionRegisterScreen()),
+  GoRoute(
+      path: '/settings', builder: (context, state) => const SettingsScreen()),
 ]);

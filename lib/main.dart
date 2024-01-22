@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'router.dart';
 import 'package:provider/provider.dart';
 import 'package:project_study/auth_provider.dart';
@@ -23,6 +25,7 @@ class _MainAppState extends State<MainApp> {
     setState(() {
       authProvider = AuthProvider().build();
     });
+    GoogleFonts.pacifico();
   }
 
   @override

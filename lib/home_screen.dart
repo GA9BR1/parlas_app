@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:like_button/like_button.dart';
@@ -79,7 +80,11 @@ class _CardPagesState extends State<CardPages> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
-            return const CircularProgressIndicator();
+            return const Center(
+                child: SpinKitThreeBounce(
+              color: Colors.white,
+              size: 30,
+            ));
           } else {
             if (snapshot.hasData) {
               return PageView(

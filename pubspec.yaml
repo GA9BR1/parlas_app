@@ -15,6 +15,9 @@ dependencies:
   provider:
   http:
   like_button:
+  cached_network_image:
+  flutter_spinkit:
+  image_picker:
 
 dev_dependencies:
   flutter_test:

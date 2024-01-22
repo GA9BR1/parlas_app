@@ -38,6 +38,35 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    var url = Uri.parse("$baseUrl/auth");
+    try {
+      var response = await http.post(url, body: {
+        "name": name,
+        "email": email,
+        "password": password,
+        "password_confirmation": password,
+      });
+      print(response.body);
+      if (response.statusCode == 200) {
+        user.uid = response.headers['uid'];
+        user.client = response.headers['client'];
+        user.accessToken = response.headers['access-token'];
+        await persistUser();
+      } else if (response.statusCode == 422) {
+        return Future.error('You forgot to fill some fields. Fill them all');
+      } else {
+        return Future.error('An unkown error has ocourred. Try again later');
+      }
+    } catch (e) {
+      return Future.error('An unkown error has ocourred. Try again later');
+    }
+  }
+
   Future<void> persistUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('uid', user.uid!);
